@@ -25,7 +25,7 @@
       <div class="p-3 border-t border-neutral-800">
         <div class="flex items-center gap-3 px-3 py-2 text-sm text-neutral-500">
           <UIcon name="i-lucide-tag" class="w-4 h-4 shrink-0" />
-          <span>v0.1.0 — Phase 0</span>
+          <span>v0.1.0 — Phase 1</span>
         </div>
       </div>
     </aside>
@@ -36,6 +36,11 @@
         <p class="text-sm text-neutral-400">{{ pageTitle }}</p>
         <div class="flex items-center gap-3">
           <UColorModeButton />
+          <UDropdownMenu :items="userMenuItems" :content="{ align: 'end' }">
+            <UButton variant="ghost" color="neutral" size="sm" trailing-icon="i-lucide-chevron-down">
+              {{ session.value?.data?.user?.name ?? '...' }}
+            </UButton>
+          </UDropdownMenu>
         </div>
       </header>
       <main class="flex-1 overflow-y-auto p-6">
@@ -47,6 +52,8 @@
 
 <script setup lang="ts">
 const route = useRoute()
+const { useSession, signOut } = useAuth()
+const session = useSession()
 
 const navigation = [
   { to: '/', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
@@ -59,4 +66,27 @@ const pageTitles: Record<string, string> = {
 }
 
 const pageTitle = computed(() => pageTitles[route.path] ?? 'CubeHost')
+
+const userMenuItems = computed(() => [
+  [
+    {
+      label: session.value?.data?.user?.email ?? '',
+      disabled: true,
+    },
+    {
+      label: `Rôle : ${(session.value?.data?.user as any)?.role ?? '—'}`,
+      disabled: true,
+    },
+  ],
+  [
+    {
+      label: 'Déconnexion',
+      icon: 'i-lucide-log-out',
+      onSelect: async () => {
+        await signOut()
+        await navigateTo('/auth/login')
+      },
+    },
+  ],
+])
 </script>

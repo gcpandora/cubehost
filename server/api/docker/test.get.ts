@@ -1,6 +1,8 @@
 import Docker from 'dockerode'
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await requireSession(event)
+
   const socketPath = process.platform === 'win32'
     ? '//./pipe/docker_engine'
     : '/var/run/docker.sock'
